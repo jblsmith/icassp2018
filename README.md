@@ -1,6 +1,6 @@
 # ICASSP 2018: Nonnegative Tensor Factorization for Source Separation of Loops in Audio
 
-This site contains instructions on how to generate the ground truth data related to our ICASSP 2018 publication, "Nonnegative Tensor Factorization for Source Separation of Loops in Audio", [described in detail here](http://jblsmith.github.io/projects/nonnegative-tensor-factorization/) ([PDF](http://jblsmith.github.io/documents/smith2018-icassp-nonnegative_tensor_factorization.pdf)).
+This site contains instructions on how to generate the ground truth data related to our ICASSP 2018 publication, "Nonnegative Tensor Factorization for Source Separation of Loops in Audio" ([PDF](http://jblsmith.github.io/documents/smith2018-icassp-nonnegative_tensor_factorization.pdf)), [described in detail here](http://jblsmith.github.io/projects/nonnegative-tensor-factorization/).
 
 	@inproceedings{smith2018nonnegative,
 	Address = {Calgary, AB, Canada},
@@ -22,9 +22,11 @@ The prevalence of exact repetition in loop-based music makes it an opportune tar
 
 3. To generate In Python, run:
 
-	import audio_generation as ag
-	ag.generate_tutti_datasets()	# Generates a downmixed file for each stimulus
-	ag.generate_solo_datasets()	# Generates a single-source file for each source in each stimulus
+```
+import audio_generation as ag
+ag.generate_tutti_datasets()	# Generates a downmixed file for each stimulus
+ag.generate_solo_datasets()	# Generates a single-source file for each source in each stimulus
+```
 
 ## Source
 
