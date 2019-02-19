@@ -1,3 +1,4 @@
+from __future__ import print_function, division
 import librosa, librosa.display
 import pyDOE
 import numpy as np
@@ -82,7 +83,7 @@ def load_audio_clips(audio_type):
 # Create an audio file based on a layout and an audio type:
 def implement_song_plan(plan, audio_clips, solo_index=None):
 	if plan.shape[0]>len(audio_clips):
-		print "Error! Fewer clip types exist than called for in the plan. We will loop over clip types."
+		print("Error! Fewer clip types exist than called for in the plan. We will loop over clip types.")
 	if solo_index is not None:
 		one_hot = np.zeros((plan.shape[0],1)).astype(int)
 		one_hot[solo_index] = 1
@@ -100,7 +101,7 @@ def implement_song_plan(plan, audio_clips, solo_index=None):
 
 def generate_tutti_datasets():
 	for plantype in ["lopez_serrano", "factorial", "factorial_random"]:
-		print "Making " + plantype + " set..."
+		print("Making " + plantype + " set...")
 		plan = generate_song_plan(15,4,plantype)
 		target_path = os.path.abspath("./arranged_clips/" + plantype)
 		if not os.path.exists(target_path):
@@ -113,7 +114,7 @@ def generate_tutti_datasets():
 
 def generate_solo_datasets():
 	for plantype in ["lopez_serrano", "factorial", "factorial_random"]:
-		print "Making " + plantype + " set..."
+		print("Making " + plantype + " set...")
 		plan = generate_song_plan(15,4,plantype)
 		target_path = os.path.abspath("./solo_clips/" + plantype)
 		if not os.path.exists(target_path):
