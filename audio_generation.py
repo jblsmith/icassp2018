@@ -1,16 +1,18 @@
 from __future__ import print_function, division
 import librosa, librosa.display
-import pyDOE
+import pyDOE2 as pyDOE
 import numpy as np
 import os
 import glob
 
-ingredients_path = os.path.abspath("./ISMIR16-EM-Patterns-Audio/dataset")
-data_filepaths = glob.glob(ingredients_path + "/*.wav")
-filepath_info = [os.path.splitext(os.path.basename(filepath))[0].split("_") for filepath in data_filepaths]
-tempos, genres, instrs = zip(*filepath_info)
-music_envs = [tempos[i]+"_"+genres[i] for i in range(len(tempos))]
-audio_library = {music_env: [instrs[j] for j in range(len(instrs)) if music_env==music_envs[j]] for music_env in music_envs}
+def load_audio_library(ingredients_path = os.path.abspath("./ISMIR16-EM-Patterns-Audio/dataset")):
+	data_filepaths = glob.glob(ingredients_path + "/*.wav")
+	filepath_info = [os.path.splitext(os.path.basename(filepath))[0].split("_") for filepath in data_filepaths]
+	tempos, genres, instrs = zip(*filepath_info)
+	music_envs = [tempos[i]+"_"+genres[i] for i in range(len(tempos))]
+	clips_dict = {music_env: [instrs[j] for j in range(len(instrs)) if music_env==music_envs[j]] for music_env in music_envs}
+	audio_library = {'clips': clips_dict, 'dir': ingredients_path}
+	return audio_library
 
 def generate_song_plan(nloops = 10, ntracks = 4, plantype="random", seed=0):
 	"""
@@ -73,10 +75,10 @@ def generate_song_plan(nloops = 10, ntracks = 4, plantype="random", seed=0):
 		np.random.shuffle(plan.transpose())			
 	return plan
 
-def load_audio_clips(audio_type):
+def load_audio_clips(audio_type, audio_library):
 	audio_clips_X = []
-	for clipname in audio_library[audio_type]:
-		clip_audio, fs = librosa.core.load(ingredients_path + "/" + audio_type + "_" + clipname + ".wav", sr=22050, mono=True)
+	for clipname in audio_library['clips'][audio_type]:
+		clip_audio, fs = librosa.core.load(audio_library['dir'] + "/" + audio_type + "_" + clipname + ".wav", sr=22050, mono=True)
 		audio_clips_X.append(clip_audio)
 	return audio_clips_X, fs
 
@@ -99,29 +101,38 @@ def implement_song_plan(plan, audio_clips, solo_index=None):
 				output_audio[downbeat_times[j]:downbeat_times[j+1]] += audio_clips[i]
 	return output_audio
 
-def generate_tutti_datasets():
+def generate_tutti_datasets(audio_library):
 	for plantype in ["lopez_serrano", "factorial", "factorial_random"]:
 		print("Making " + plantype + " set...")
 		plan = generate_song_plan(15,4,plantype)
 		target_path = os.path.abspath("./arranged_clips/" + plantype)
 		if not os.path.exists(target_path):
 			os.makedirs(target_path)
-		for genre in audio_library.keys():
-			clips, audio_fs = load_audio_clips(genre)
+		for genre in audio_library['clips'].keys():
+			clips, audio_fs = load_audio_clips(genre, audio_library)
 			audio_X = implement_song_plan(plan, clips)
 			local_filename = target_path + "/" + genre + ".wav"
 			librosa.output.write_wav(local_filename,y=audio_X,sr=audio_fs)
 
-def generate_solo_datasets():
+def generate_solo_datasets(audio_library):
 	for plantype in ["lopez_serrano", "factorial", "factorial_random"]:
 		print("Making " + plantype + " set...")
 		plan = generate_song_plan(15,4,plantype)
 		target_path = os.path.abspath("./solo_clips/" + plantype)
 		if not os.path.exists(target_path):
 			os.makedirs(target_path)
-		for genre in audio_library.keys():
-			clips, audio_fs = load_audio_clips(genre)
+		for genre in audio_library['clips'].keys():
+			clips, audio_fs = load_audio_clips(genre, audio_library)
 			for i in range(plan.shape[0]):
 				audio_X = implement_song_plan(plan, clips, solo_index=i)
 				local_filename = target_path + "/" + genre + "_" + str(i) + ".wav"
 				librosa.output.write_wav(local_filename,y=audio_X,sr=audio_fs)
+
+if __name__ == "__main__":
+	audio_library = load_audio_library(os.path.abspath("./ISMIR16-EM-Patterns-Audio/dataset"))
+	# Generate a downmixed file for each stimulus:
+	print("Generating tutti audio files:")
+	generate_tutti_datasets(audio_library)
+	# Generate a single-source file for each source in each stimulus:
+	print("Generating solo audio files:")
+	generate_solo_datasets(audio_library)

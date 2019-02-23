@@ -20,12 +20,11 @@ The prevalence of exact repetition in loop-based music makes it an opportune tar
 
 2. Unzip the dataset and move the folder ("ISMIR16-EM-Patterns-Audio") to your working directory.
 
-3. To generate In Python, run:
+3. In terminal, run:
 
 ```
-import audio_generation as ag
-ag.generate_tutti_datasets()	# Generates a downmixed file for each stimulus
-ag.generate_solo_datasets()	# Generates a single-source file for each source in each stimulus
+cd icassp2018
+python audio_generation.py
 ```
 
 ## Source
