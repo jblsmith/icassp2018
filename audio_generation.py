@@ -10,7 +10,7 @@ def load_audio_library(ingredients_path = os.path.abspath("./ISMIR16-EM-Patterns
 	filepath_info = [os.path.splitext(os.path.basename(filepath))[0].split("_") for filepath in data_filepaths]
 	tempos, genres, instrs = zip(*filepath_info)
 	music_envs = [tempos[i]+"_"+genres[i] for i in range(len(tempos))]
-	clips_dict = {music_env: [instrs[j] for j in range(len(instrs)) if music_env==music_envs[j]] for music_env in music_envs}
+	clips_dict = {music_env: sorted([instrs[j] for j in range(len(instrs)) if music_env==music_envs[j]]) for music_env in music_envs}
 	audio_library = {'clips': clips_dict, 'dir': ingredients_path}
 	return audio_library
 
@@ -19,7 +19,7 @@ def generate_song_plan(nloops = 10, ntracks = 4, plantype="random", seed=0):
 	This function drafts a layout for the song.
 	Tracks 0--3 are: "bass", "drum", "fx", "melody".
 	The layout for the example shown on https://www.audiolabs-erlangen.de/resources/MIR/2016-ISMIR-EMLoop is:
-		Track 1 (bass):	X XX
+		Track 1 (bass):	  X XX
 		Track 2 (drum): XXX XX
 		Track 3 (f.x.):        [empty]
 		Track 4 (mel.):  XXXX 
@@ -125,7 +125,7 @@ def generate_solo_datasets(audio_library):
 			clips, audio_fs = load_audio_clips(genre, audio_library)
 			for i in range(plan.shape[0]):
 				audio_X = implement_song_plan(plan, clips, solo_index=i)
-				local_filename = target_path + "/" + genre + "_" + str(i) + ".wav"
+				local_filename = target_path + "/" + genre + "_" + audio_library['clips'][genre][i] + ".wav"
 				librosa.output.write_wav(local_filename,y=audio_X,sr=audio_fs)
 
 if __name__ == "__main__":
