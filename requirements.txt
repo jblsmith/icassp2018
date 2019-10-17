@@ -1,5 +1,4 @@
-glob
 librosa
+matplotlib
 numpy
-os
 pyDOE2
